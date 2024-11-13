@@ -3,7 +3,7 @@ spring:
     name: time-machine
   datasource:
     url: ${DB_JDBC_URL}
-    username: ${DB_USER_NAME}
+    username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
@@ -14,5 +14,8 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity-in-milliseconds: ${ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
 server:
   port: 8081
