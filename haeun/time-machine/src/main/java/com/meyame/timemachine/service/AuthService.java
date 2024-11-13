@@ -1,5 +1,6 @@
 package com.meyame.timemachine.service;
 
+import com.meyame.timemachine.domain.auth.Role;
 import com.meyame.timemachine.dto.request.auth.SignInReqDto;
 import com.meyame.timemachine.dto.response.token.TokenResDto;
 import com.meyame.timemachine.exception.code.ErrorCode;
@@ -39,6 +40,7 @@ public class AuthService {
                 .email(signUpReqDto.email())
                 .password(encodedPassword)
                 .name(signUpReqDto.name())
+                .role(Role.USER)
                 .build());
         return SignUpResDto.from(user);
     }
