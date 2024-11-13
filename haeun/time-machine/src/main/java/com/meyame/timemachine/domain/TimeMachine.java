@@ -1,7 +1,10 @@
 package com.meyame.timemachine.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.meyame.timemachine.domain.auth.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +29,20 @@ public class TimeMachine {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
+
+    @Builder
+    public TimeMachine(Long id, String name, String message, Date departureDate, Date targetDate, User user) {
+        this.id = id;
+        this.name = name;
+        this.message = message;
+        this.departureDate = departureDate;
+        this.targetDate = targetDate;
+        this.user = user;
+    }
+
+    public void update(String name,String message, Date targetDate) {
+        this.name = name;
+        this.message = message;
+        this.targetDate = targetDate;
+    }
 }
