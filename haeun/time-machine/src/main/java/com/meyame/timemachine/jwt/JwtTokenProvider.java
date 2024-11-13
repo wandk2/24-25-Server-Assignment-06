@@ -47,6 +47,7 @@ public class JwtTokenProvider {
                 .setSubject(user.getId().toString())
                 // 사용자 정의 Claims (Custom Claims) - 표준에 정의되지 않은 추가 정보
                 // -> claim() 함수로 정의 (Role 이나 Permission 같이)
+                .claim("email",user.getEmail()) // 사용자 이메일도 클레임에 추가
                 .claim(ROLE_CLAIM, user.getRole().name())
                 .setExpiration(accessTokenExpiredTime)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -74,11 +75,15 @@ public class JwtTokenProvider {
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList());
 
-        // authorities 권한 리스트가 Authentication 객체에 설정된다.
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(claims.getSubject(), "", authorities);
-        authentication.setDetails(claims);
+        // 사용자 정보를 UserPrincipal로 생성
+        UserPrincipal userPrincipal = new UserPrincipal(
+                Long.valueOf(claims.getSubject()), // subject를 사용자 ID로 사용
+                claims.get("email", String.class),  // 추가된 이메일 정보 가져오기
+                "", // 비밀번호는 빈 문자열로 설정
+                authorities
+        );
 
-        return authentication;
+        return new UsernamePasswordAuthenticationToken(userPrincipal, "", authorities);
     }
 
     // 토큰 추출
