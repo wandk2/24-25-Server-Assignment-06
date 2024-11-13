@@ -49,7 +49,7 @@ public class AuthService {
     @Transactional
     public TokenResDto signIn(SignInReqDto signInReqDto) {
         User user = userRepository.findByEmail(signInReqDto.email())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         // 비밀번호 검증
         if(!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
