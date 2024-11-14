@@ -7,5 +7,4 @@ public record TimeMachineUpdateReqDto(
         String message,
         Date departureDate,
         Date targetDate
-){
-}
+){}

@@ -4,5 +4,4 @@ public record SignUpReqDto(
         String email,
         String password,
         String name
-){
-}
+){}
