@@ -38,4 +38,10 @@ public class User {
         this.name = name;
         this.role = Role.USER;
     }
+
+    public void update(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
 }

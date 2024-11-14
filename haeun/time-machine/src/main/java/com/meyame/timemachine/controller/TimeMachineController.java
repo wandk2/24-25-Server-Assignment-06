@@ -38,7 +38,7 @@ public class TimeMachineController {
     }
 
     // 자신의 모든 타임머신 조회
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<TimeMachineInfoResDto>> getAllUserTimeMachinesInfo(@AuthenticationPrincipal UserPrincipal userPrincipal){
         List<TimeMachineInfoResDto> timeMachineList = timeMachineService.getAllUserTimeMachinesInfo(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK).body(timeMachineList);

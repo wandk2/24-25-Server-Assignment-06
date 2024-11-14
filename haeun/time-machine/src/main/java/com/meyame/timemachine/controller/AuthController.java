@@ -1,6 +1,5 @@
 package com.meyame.timemachine.controller;
 
-import com.meyame.timemachine.dto.request.auth.RefreshTokenReqDto;
 import com.meyame.timemachine.dto.request.auth.RefreshTokenSignInReqDto;
 import com.meyame.timemachine.dto.request.auth.SignInReqDto;
 import com.meyame.timemachine.dto.request.auth.SignUpReqDto;
@@ -45,7 +44,7 @@ public class AuthController {
     }
 
     //refresh token 을 이용한 로그인 요청
-    @PostMapping("/refreshToken/signIn")
+    @PostMapping("/signIn/refresh")
     public ResponseEntity<RefreshTokenSignInResDto> refreshTokenSignIn(@RequestBody RefreshTokenSignInReqDto refreshTokenSignInReqDto) {
         RefreshTokenSignInResDto token = authService.signInWithRefreshToken(refreshTokenSignInReqDto);
         return ResponseEntity.status(HttpStatus.OK).body(token);
@@ -53,7 +52,7 @@ public class AuthController {
 
     // access token 만료시 재발급 요청
     // Refresh token 을 헤더에 포함하여 요청
-    @PostMapping("/reissue")
+    @PostMapping("/token/reissue")
     public ResponseEntity<AccessTokenResDto> reissueRefreshToken (HttpServletRequest req, HttpServletResponse res) {
         // 요청헤더에서 Refresh Token 추출
         String refreshToken = jwtTokenProvider.resolveToken(req);

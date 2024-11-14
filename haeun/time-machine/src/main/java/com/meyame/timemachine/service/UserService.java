@@ -6,7 +6,6 @@ import com.meyame.timemachine.dto.response.user.UserInfoResDto;
 import com.meyame.timemachine.dto.response.user.UserUpdateResDto;
 import com.meyame.timemachine.exception.CustomException;
 import com.meyame.timemachine.exception.code.ErrorCode;
-import com.meyame.timemachine.jwt.UserPrincipal;
 import com.meyame.timemachine.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,8 @@ public class UserService {
     public UserUpdateResDto updateUserInfo(UserUpdateReqDto userUpdateReqDto, Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        userRepository.save(user);
+
+        user.update(userUpdateReqDto.email(),userUpdateReqDto.password(),userUpdateReqDto.name());
 
         return UserUpdateResDto.from(user);
     }
