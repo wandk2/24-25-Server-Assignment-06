@@ -5,6 +5,8 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 // jwt 토큰 생성 및 검증
 @Component // 빈으로 등록하여 다른 곳에서 의존성 주입 받아 자유롭게 설정할 수 있도록 한다.
+@Getter
 public class JwtTokenProvider {
 
     private static final String ROLE_CLAIM = "Role"; // JWT 의 payload 부분에 있다. (그니까 클이 서버에 요청할 때 토큰을 Authorization 헤더에 포함하여 전송함)
@@ -29,17 +32,21 @@ public class JwtTokenProvider {
 
     private final Key key; // jwt 서명을 위해 사용할 암호화 키
     private final long accessTokenValidityTime;
+    private final long refreshTokenValidityTime;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey,
-                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime) {
+                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
+                            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityTime
+    ) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
+        this.refreshTokenValidityTime = refreshTokenValidityTime;
     }
 
+    // access token 생성
     public String createAccessToken(User user) {
         long nowTime = (new Date().getTime());
-
         Date accessTokenExpiredTime = new Date(nowTime + accessTokenValidityTime);
 
         return Jwts.builder()
@@ -47,9 +54,24 @@ public class JwtTokenProvider {
                 .setSubject(user.getId().toString())
                 // 사용자 정의 Claims (Custom Claims) - 표준에 정의되지 않은 추가 정보
                 // -> claim() 함수로 정의 (Role 이나 Permission 같이)
+                .claim("token_type","ACCESS") // Access Token 과 Refresh Token 을 validateToken() 에서 구분하기 위해 설정
                 .claim("email",user.getEmail()) // 사용자 이메일도 클레임에 추가
                 .claim(ROLE_CLAIM, user.getRole().name())
                 .setExpiration(accessTokenExpiredTime)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // refresh token 생성
+    public String createRefreshToken(User user) {
+        long nowTime = (new Date().getTime());
+        Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
+
+        // refresh token jwt 형식으로 구현
+        return Jwts.builder()
+                .setSubject(user.getId().toString())
+                .claim("token_type","REFRESH")
+                .setExpiration(refreshTokenExpiredTime)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -95,14 +117,35 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public boolean validateToken(String token) {
+    // Access Token 유효성 검사 메서드
+    public boolean validateAccessToken(String token) {
         try {
-            Jwts.parserBuilder()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(token);
-            return true;
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // 토큰 타입이 ACCESS일 경우에만 true 반환
+            String tokenType = claims.get("token_type", String.class);
+            return "ACCESS".equals(tokenType);
         } catch (UnsupportedJwtException | ExpiredJwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+    // Refresh Token 유효성 검사 메서드
+    public boolean validateRefreshToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // 토큰 타입이 REFRESH일 경우에만 true 반환
+            String tokenType = claims.get("token_type", String.class);
+            return "REFRESH".equals(tokenType);
+        } catch (ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             return false;
         }
     }
@@ -121,4 +164,15 @@ public class JwtTokenProvider {
             throw new RuntimeException("토큰 복호화에 실패했습니다.");
         }
     }
+
+    // 응답 헤더에 Access Token 설정
+    public void setAccessTokenHeader(HttpServletResponse res, String accessToken) {
+        res.setHeader(AUTHORIZATION, BEARER + accessToken);
+    }
+
+    public Long getUserIdFromRefreshToken(String refreshToken) {
+        Claims claims = parseClaims(refreshToken);
+        return Long.valueOf(claims.getSubject());
+    }
+
 }
