@@ -28,7 +28,9 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/gdg/**").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/user/del").hasAnyRole("ROLE_ADMIN")
+                        .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -49,4 +49,11 @@ public class UserService {
                 .role(user.getRole().name())
                 .build();
     }
+
+    @Transactional
+    public void deleteByPrincipal(Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+
+        userRepository.deleteById(userId);
+    }
 }
