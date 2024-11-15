@@ -30,7 +30,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @Setter
+
     private String refreshToken;
 
     @Builder
@@ -39,5 +39,9 @@ public class User {
         this.username = username;
         this.pwd = pwd;
         this.role = role;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

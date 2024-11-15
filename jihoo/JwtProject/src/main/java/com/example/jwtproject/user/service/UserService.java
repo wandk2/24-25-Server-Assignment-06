@@ -41,7 +41,7 @@ public class UserService {
         String accessToken = tokenProvider.createAccessToken(findUser);
         String refreshToken = tokenProvider.createRefreshToken(findUser);
 
-        findUser.setRefreshToken(refreshToken);
+        findUser.updateRefreshToken(refreshToken);
 
         userRepository.save(findUser);
 
