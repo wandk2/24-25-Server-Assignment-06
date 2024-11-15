@@ -1,6 +1,5 @@
 package com.example.jwtproject.user.dto.response;
 
-
 import com.example.jwtproject.user.domain.User;
 import lombok.Builder;
 

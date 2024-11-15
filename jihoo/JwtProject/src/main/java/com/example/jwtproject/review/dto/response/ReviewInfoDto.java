@@ -2,7 +2,6 @@ package com.example.jwtproject.review.dto.response;
 
 import com.example.jwtproject.review.domain.Review;
 import lombok.Builder;
-
 import java.time.LocalDateTime;
 
 @Builder

@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.io.Decoders;
 import org.springframework.util.StringUtils;
+
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,7 +36,8 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
         this.refreshTokenValidityTime = refreshTokenValidityTime;
-}
+    }
+
     public String createAccessToken(User user) {
         long nowTime = (new Date().getTime());
 
@@ -128,5 +130,3 @@ public class TokenProvider {
         }
     }
 }
-
-

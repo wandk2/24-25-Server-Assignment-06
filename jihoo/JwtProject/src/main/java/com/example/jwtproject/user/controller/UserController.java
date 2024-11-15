@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserInfoDto>signUp(@RequestBody UserSignUpDto userSignUpDto) {
+    public ResponseEntity<UserInfoDto> signUp(@RequestBody UserSignUpDto userSignUpDto) {
         return ResponseEntity.ok().body(userService.saveUser(userSignUpDto));
     }
 
@@ -39,7 +40,7 @@ public class UserController {
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserInfoDto>> getAllUsers(Principal principal) {
-       return ResponseEntity.ok().body(userService.getAllUsers());
+        return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
     @PostMapping("/refresh")
