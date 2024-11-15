@@ -5,35 +5,36 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.Id;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
-
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "USER_EMAIL", nullable = false)
+    @Column(name = "ADMIN_EMAIL", nullable = false)
     private String email;
 
-    @Column(name = "USER_PASSWORD", nullable = false)
+    @Column(name = "ADMIN_PASSWORD", nullable = false)
     private String password;
 
-    @Column(name = "USER_PHONE_NUMBER", nullable = false)
+    @Column(name = "ADMIN_PHONE_NUMBER", nullable = false)
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "USER_ROLE", nullable = false)
-    private Role role;
+    @Column(name = "AUTH_CODE")
+    private String authCode;
+
+    @Column(name = "ROLE")
+    private String role;
 
     @Builder
-    public User(String email, String password, String phoneNumber) {
+    public Admin(String email, String password, String phoneNumber, String authCode, String role) {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.role = Role.USER;
+        this.authCode = authCode;
+        this.role = role;
     }
 }
