@@ -21,7 +21,6 @@ public class MovieController {
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MovieInfoDto> saveMovie(@RequestBody MovieDto movieDto) {
-
         return ResponseEntity.ok().body(movieService.saveMovie(movieDto));
     }
 

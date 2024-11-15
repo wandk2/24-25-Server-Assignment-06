@@ -26,7 +26,6 @@ public class ReviewController {
 
     @GetMapping("/{reviewId}")
     public ResponseEntity<ReviewInfoDto> getReview(Principal principal, @PathVariable long reviewId) {
-
         return ResponseEntity.ok().body(reviewService.getReview(reviewId));
     }
 
