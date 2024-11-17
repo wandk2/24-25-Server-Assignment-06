@@ -5,15 +5,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "user_id", nullable = false)
     private String userId;
 
@@ -27,9 +27,11 @@ public class User {
     @Column(name = "user_role", nullable = false)
     private Role role;
 
+    @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boardList = new ArrayList<>();
+
     @Builder
-    public User(Long id, String userId, String userName, String password, Role role) {
-        this.id = id;
+    public User(String userId, String userName, String password, Role role) {
         this.userId = userId;
         this.userName = userName;
         this.password = password;

@@ -1,10 +1,11 @@
 package com.example.jwtlogin.service;
 
-import com.example.jwtlogin.UserRepository;
+import com.example.jwtlogin.domain.Role;
+import com.example.jwtlogin.repository.UserRepository;
 import com.example.jwtlogin.domain.User;
-import com.example.jwtlogin.dto.TokenDto;
-import com.example.jwtlogin.dto.UserInfoDto;
-import com.example.jwtlogin.dto.UserSignDto;
+import com.example.jwtlogin.dto.token.TokenDto;
+import com.example.jwtlogin.dto.response.UserInfoDto;
+import com.example.jwtlogin.dto.request.UserSignDto;
 import com.example.jwtlogin.jwt.TokenProvider;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,15 @@ public class UserService {
 
     @Transactional
     public TokenDto signUp(UserSignDto userSignDto) {
+        if(userRepository.findById(userSignDto.getUserId()).isPresent()) {
+            throw new IllegalArgumentException("이미 사용중인 ID입니다.");
+        }
+
         User user = userRepository.save(User.builder()
                 .userId(userSignDto.getUserId())
                 .userName(userSignDto.getUsername())
                 .password(passwordEncoder.encode(userSignDto.getPassword()))
+                .role(Role.ROLE_USER)
                 .build());
 
         String accessToken = tokenProvider.createAccessToken(user);
@@ -38,7 +44,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserInfoDto findByPrincipal(Principal principal) {
-        Long userId = Long.parseLong(principal.getName());
+        String userId = principal.getName();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
@@ -46,14 +52,24 @@ public class UserService {
         return UserInfoDto.builder()
                 .userId(user.getUserId())
                 .username(user.getUserName())
-                .role(user.getRole().name())
+                .password(user.getPassword())
+                .role(user.getRole())
                 .build();
     }
 
     @Transactional
-    public void deleteByPrincipal(Principal principal) {
-        Long userId = Long.parseLong(principal.getName());
+    public TokenDto mkadmin(UserSignDto userSignDto) {
+        User user = userRepository.save(User.builder()
+                .userId(userSignDto.getUserId())
+                .userName(userSignDto.getUsername())
+                .password(passwordEncoder.encode(userSignDto.getPassword()))
+                .role(Role.ROLE_ADMIN)
+                .build());
 
-        userRepository.deleteById(userId);
+        String accessToken = tokenProvider.createAccessToken(user);
+
+        return TokenDto.builder()
+                .token(accessToken)
+                .build();
     }
 }

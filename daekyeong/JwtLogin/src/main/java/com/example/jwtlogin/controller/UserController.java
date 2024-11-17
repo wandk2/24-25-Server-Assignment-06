@@ -1,13 +1,10 @@
 package com.example.jwtlogin.controller;
 
-import com.example.jwtlogin.dto.TokenDto;
-import com.example.jwtlogin.dto.UserInfoDto;
-import com.example.jwtlogin.dto.UserSignDto;
+import com.example.jwtlogin.dto.token.TokenDto;
+import com.example.jwtlogin.dto.response.UserInfoDto;
+import com.example.jwtlogin.dto.request.UserSignDto;
 import com.example.jwtlogin.service.UserService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.http11.Http11InputBuffer;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,15 +12,15 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/user")
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
     public ResponseEntity<TokenDto> signUp(@RequestBody UserSignDto userSignDto) {
-        TokenDto response = userService.signUp(userSignDto);
+        TokenDto token = userService.signUp(userSignDto);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(token);
     }
     @GetMapping("/getUser")
     public ResponseEntity<UserInfoDto> getUser(Principal principal) {
@@ -32,10 +29,11 @@ public class UserController {
         return ResponseEntity.ok(userInfoDto);
     }
 
-    @DeleteMapping("/delUser")
-    public ResponseEntity<UserInfoDto> delUser(Principal principal) {
-        userService.deleteByPrincipal(principal);
+    //어드민 권한 부여기능 임시로 설정
+    @PostMapping("/mkadmin")
+    public ResponseEntity<TokenDto> mkAdmin(@RequestBody UserSignDto userSignDto) {
+        TokenDto token = userService.mkadmin(userSignDto);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(token);
     }
 }

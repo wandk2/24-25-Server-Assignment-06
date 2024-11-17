@@ -43,7 +43,7 @@ public class TokenProvider {
         Date accessTokenExpirationDate = new Date(nowTime + accessTokenValidityTime);
 
         return Jwts.builder()
-                .setSubject(user.getId().toString())
+                .setSubject(user.getUserId())
                 .claim(ROLE_CLAIM, user.getRole().name())
                 .setExpiration(accessTokenExpirationDate)
                 .signWith(key, SignatureAlgorithm.HS256)

@@ -1,5 +1,6 @@
-package com.example.jwtlogin.dto;
+package com.example.jwtlogin.dto.response;
 
+import com.example.jwtlogin.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,5 +12,5 @@ public class UserInfoDto {
     private String userId;
     private String username;
     private String password;
-    private String role;
+    private Role role;
 }
